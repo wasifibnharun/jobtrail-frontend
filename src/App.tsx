@@ -9,16 +9,14 @@ import AuthProvider from "./auth/AuthProvider";
 import AppLayout from "./components/AppLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PlaceholderPage from "./pages/PlaceholderPage";
+import Login from "./pages/Login";
 
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route
-            path="/login"
-            element={<PlaceholderPage title="Login" />}
-          />
+          <Route path="/login" element={<Login />} />
           <Route
             path="/register"
             element={<PlaceholderPage title="Register" />}
