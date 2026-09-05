@@ -12,6 +12,7 @@ import PlaceholderPage from "./pages/PlaceholderPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import ApplicationList from "./pages/ApplicationList";
 
 export default function App() {
   return (
@@ -24,10 +25,7 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
               <Route path="/" element={<Dashboard />} />
-              <Route
-                path="/applications"
-                element={<PlaceholderPage title="Applications" />}
-              />
+              <Route path="/applications" element={<ApplicationList />} />
               <Route
                 path="/applications/new"
                 element={<PlaceholderPage title="Add application" />}
