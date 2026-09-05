@@ -161,17 +161,17 @@ export default function ApplicationForm() {
     <div className="mx-auto max-w-3xl">
       <Link
         to="/applications"
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-[#59645f] hover:text-emerald-700"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-[#59645f] hover:text-emerald-700 dark:text-[#aab5af] dark:hover:text-emerald-400"
       >
         <ArrowLeft size={16} aria-hidden="true" />
         Back to applications
       </Link>
 
       <header className="mt-5">
-        <h1 className="text-2xl font-semibold text-[#17211d]">
+        <h1 className="text-2xl font-semibold text-[#17211d] dark:text-[#edf3f0]">
           {isEditing ? "Edit application" : "Add application"}
         </h1>
-        <p className="mt-1 text-sm text-[#66716c]">
+        <p className="mt-1 text-sm text-[#66716c] dark:text-[#aab5af]">
           {isEditing
             ? "Update the details of this opportunity."
             : "Record a new opportunity in your job search."}
@@ -180,12 +180,12 @@ export default function ApplicationForm() {
 
       <form
         onSubmit={handleSubmit}
-        className="mt-6 rounded-lg border border-[#dce3df] bg-white p-5 shadow-sm sm:p-7"
+        className="mt-6 rounded-lg border border-[#dce3df] bg-white p-5 shadow-sm dark:border-[#34413b] dark:bg-[#18201d] sm:p-7"
       >
         {errors.detail?.[0] && (
           <p
             role="alert"
-            className="mb-5 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+            className="mb-5 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/50 dark:text-red-300"
           >
             {errors.detail[0]}
           </p>
@@ -197,17 +197,17 @@ export default function ApplicationForm() {
           onChange={updateField}
         />
 
-        <div className="mt-7 flex flex-wrap justify-end gap-3 border-t border-[#e6ebe8] pt-5">
+        <div className="mt-7 flex flex-wrap justify-end gap-3 border-t border-[#e6ebe8] pt-5 dark:border-[#2d3933]">
           <Link
             to="/applications"
-            className="rounded-md border border-[#cfd8d3] px-4 py-2.5 text-sm font-medium text-[#36413c] hover:bg-[#f4f6f5]"
+            className="rounded-md border border-[#cfd8d3] px-4 py-2.5 text-sm font-medium text-[#36413c] hover:bg-[#f4f6f5] dark:border-[#435149] dark:text-[#dce5e0] dark:hover:bg-[#26312c]"
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={saving}
-            className="flex items-center gap-1.5 rounded-md bg-emerald-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex items-center gap-1.5 rounded-md bg-emerald-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-emerald-600 dark:hover:bg-emerald-500"
           >
             <Save size={17} aria-hidden="true" />
             {saving ? "Saving..." : "Save application"}

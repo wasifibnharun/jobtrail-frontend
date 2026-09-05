@@ -2,6 +2,7 @@ import axios from "axios";
 import { BriefcaseBusiness, LogIn } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import ThemeToggle from "../components/ThemeToggle";
 
 import useAuth from "../auth/useAuth";
 
@@ -44,26 +45,29 @@ export default function Login() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#f4f6f5] px-4 py-10">
+    <main className="relative flex min-h-screen items-center justify-center bg-[#f4f6f5] px-4 py-10 text-[#18201d] dark:bg-[#101513] dark:text-[#edf3f0]">
+      <div className="absolute right-4 top-4">
+        <ThemeToggle />
+      </div>
       <section className="w-full max-w-md">
         <Link
           to="/"
-          className="mb-6 flex items-center justify-center gap-2 text-xl font-semibold text-[#17211d]"
+          className="mb-6 flex items-center justify-center gap-2 text-xl font-semibold text-[#17211d] dark:text-[#edf3f0]"
         >
           <BriefcaseBusiness size={24} aria-hidden="true" />
           JobTrail
         </Link>
 
-        <div className="rounded-lg border border-[#dce3df] bg-white p-6 shadow-sm sm:p-8">
-          <h1 className="text-2xl font-semibold text-[#17211d]">
+        <div className="rounded-lg border border-[#dce3df] bg-white p-6 shadow-sm dark:border-[#34413b] dark:bg-[#18201d] sm:p-8">
+          <h1 className="text-2xl font-semibold text-[#17211d] dark:text-[#edf3f0]">
             Welcome back
           </h1>
-          <p className="mt-1 text-sm text-[#66716c]">
+          <p className="mt-1 text-sm text-[#66716c] dark:text-[#aab5af]">
             Sign in to manage your applications.
           </p>
 
           {routeState?.message && (
-            <p className="mt-5 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+            <p className="mt-5 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-300">
               {routeState.message}
             </p>
           )}
@@ -71,14 +75,14 @@ export default function Login() {
           {error && (
             <p
               role="alert"
-              className="mt-5 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+              className="mt-5 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/50 dark:text-red-300"
             >
               {error}
             </p>
           )}
 
           <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
-            <label className="block text-sm font-medium text-[#29332f]">
+            <label className="block text-sm font-medium text-[#29332f] dark:text-[#dce5e0]">
               Username
               <input
                 type="text"
@@ -86,11 +90,11 @@ export default function Login() {
                 required
                 value={username}
                 onChange={(event) => setUsername(event.target.value)}
-                className="mt-2 w-full rounded-md border border-[#cfd8d3] px-3 py-2.5 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+                className="mt-2 w-full rounded-md border border-[#cfd8d3] bg-white px-3 py-2.5 text-[#18201d] outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 dark:border-[#435149] dark:bg-[#111815] dark:text-[#edf3f0] dark:focus:border-emerald-500 dark:focus:ring-emerald-950"
               />
             </label>
 
-            <label className="block text-sm font-medium text-[#29332f]">
+            <label className="block text-sm font-medium text-[#29332f] dark:text-[#dce5e0]">
               Password
               <input
                 type="password"
@@ -98,25 +102,25 @@ export default function Login() {
                 required
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                className="mt-2 w-full rounded-md border border-[#cfd8d3] px-3 py-2.5 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+                className="mt-2 w-full rounded-md border border-[#cfd8d3] bg-white px-3 py-2.5 text-[#18201d] outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 dark:border-[#435149] dark:bg-[#111815] dark:text-[#edf3f0] dark:focus:border-emerald-500 dark:focus:ring-emerald-950"
               />
             </label>
 
             <button
               type="submit"
               disabled={submitting}
-              className="flex w-full items-center justify-center gap-2 rounded-md bg-emerald-700 px-4 py-2.5 font-medium text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex w-full items-center justify-center gap-2 rounded-md bg-emerald-700 px-4 py-2.5 font-medium text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-emerald-600 dark:hover:bg-emerald-500"
             >
               <LogIn size={18} aria-hidden="true" />
               {submitting ? "Signing in..." : "Sign in"}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-[#66716c]">
+          <p className="mt-6 text-center text-sm text-[#66716c] dark:text-[#aab5af]">
             New to JobTrail?{" "}
             <Link
               to="/register"
-              className="font-medium text-emerald-700 hover:underline"
+              className="font-medium text-emerald-700 hover:underline dark:text-emerald-400"
             >
               Create an account
             </Link>

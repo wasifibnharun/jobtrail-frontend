@@ -47,22 +47,22 @@ export default function ConfirmModal({
         aria-modal="true"
         aria-labelledby="delete-title"
         aria-describedby="delete-description"
-        className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
+        className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:border dark:border-[#34413b] dark:bg-[#18201d]"
       >
-        <div className="flex size-10 items-center justify-center rounded-md bg-red-100 text-red-700">
+        <div className="flex size-10 items-center justify-center rounded-md bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">
           <Trash2 size={20} aria-hidden="true" />
         </div>
 
         <h2
           id="delete-title"
-          className="mt-4 text-lg font-semibold text-[#202b26]"
+          className="mt-4 text-lg font-semibold text-[#202b26] dark:text-[#edf3f0]"
         >
           Delete application?
         </h2>
 
-        <p id="delete-description" className="mt-2 text-sm text-[#66716c]">
+        <p id="delete-description" className="mt-2 text-sm text-[#66716c] dark:text-[#aab5af]">
           Delete{" "}
-          <strong className="font-semibold text-[#303b36]">
+          <strong className="font-semibold text-[#303b36] dark:text-[#dce5e0]">
             {application.position} at {application.company}
           </strong>
           ? This action cannot be undone.
@@ -71,7 +71,7 @@ export default function ConfirmModal({
         {error && (
           <p
             role="alert"
-            className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700"
+            className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300"
           >
             {error}
           </p>
@@ -83,7 +83,7 @@ export default function ConfirmModal({
             type="button"
             disabled={deleting}
             onClick={onCancel}
-            className="rounded-md border border-[#cfd8d3] px-4 py-2 text-sm font-medium text-[#36413c] hover:bg-[#f4f6f5] disabled:opacity-50"
+            className="rounded-md border border-[#cfd8d3] px-4 py-2 text-sm font-medium text-[#36413c] hover:bg-[#f4f6f5] disabled:opacity-50 dark:border-[#435149] dark:text-[#dce5e0] dark:hover:bg-[#26312c]"
           >
             Cancel
           </button>

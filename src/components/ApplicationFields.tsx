@@ -36,13 +36,13 @@ function Field({
 }: FieldProps) {
   return (
     <label htmlFor={name} className="block">
-      <span className="text-sm font-medium text-[#303b36]">
+      <span className="text-sm font-medium text-[#303b36] dark:text-[#dce5e0]">
         {label}
         {required && <span className="ml-1 text-red-600">*</span>}
       </span>
       {children}
       {error && (
-        <span className="mt-1 block text-sm text-red-600">
+        <span className="mt-1 block text-sm text-red-600 dark:text-red-400">
           {error}
         </span>
       )}
@@ -52,9 +52,12 @@ function Field({
 
 const inputClass = (hasError: boolean) =>
   [
-    "mt-2 w-full rounded-md border bg-white px-3 py-2.5 outline-none",
+    "mt-2 w-full rounded-md border bg-white px-3 py-2.5 text-[#18201d] outline-none",
     "focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100",
-    hasError ? "border-red-400" : "border-[#cfd8d3]",
+    "dark:bg-[#111815] dark:text-[#edf3f0] dark:focus:border-emerald-500 dark:focus:ring-emerald-950",
+    hasError
+      ? "border-red-400 dark:border-red-700"
+      : "border-[#cfd8d3] dark:border-[#435149]",
   ].join(" ");
 
 export default function ApplicationFields({

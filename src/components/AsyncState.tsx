@@ -11,7 +11,7 @@ export function Loader({ label = "Loading..." }: { label?: string }) {
   return (
     <div
       role="status"
-      className="flex min-h-48 items-center justify-center gap-2 text-sm text-[#66716c]"
+      className="flex min-h-48 items-center justify-center gap-2 text-sm text-[#66716c] dark:text-[#aab5af]"
     >
       <LoaderCircle
         className="animate-spin text-emerald-700"
@@ -37,17 +37,17 @@ export function EmptyState({
   actionTo,
 }: EmptyStateProps) {
   return (
-    <div className="flex min-h-52 flex-col items-center justify-center border border-dashed border-[#cfd8d3] bg-white px-5 py-10 text-center">
-      <Inbox size={28} className="text-[#7b8781]" aria-hidden="true" />
-      <h2 className="mt-3 text-base font-semibold text-[#27322d]">
+    <div className="flex min-h-52 flex-col items-center justify-center border border-dashed border-[#cfd8d3] bg-white px-5 py-10 text-center dark:border-[#435149] dark:bg-[#18201d]">
+      <Inbox size={28} className="text-[#7b8781] dark:text-[#97a49d]" aria-hidden="true" />
+      <h2 className="mt-3 text-base font-semibold text-[#27322d] dark:text-[#edf3f0]">
         {title}
       </h2>
-      <p className="mt-1 max-w-md text-sm text-[#66716c]">{message}</p>
+      <p className="mt-1 max-w-md text-sm text-[#66716c] dark:text-[#aab5af]">{message}</p>
 
       {actionLabel && actionTo && (
         <Link
           to={actionTo}
-          className="mt-5 flex items-center gap-1.5 rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800"
+          className="mt-5 flex items-center gap-1.5 rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500"
         >
           <Plus size={16} aria-hidden="true" />
           {actionLabel}
@@ -66,14 +66,14 @@ export function ErrorState({ message, onRetry }: ErrorStateProps) {
   return (
     <div
       role="alert"
-      className="flex min-h-48 flex-col items-center justify-center border border-red-200 bg-red-50 px-5 py-8 text-center"
+      className="flex min-h-48 flex-col items-center justify-center border border-red-200 bg-red-50 px-5 py-8 text-center dark:border-red-900 dark:bg-red-950/40"
     >
-      <AlertCircle size={28} className="text-red-600" aria-hidden="true" />
-      <p className="mt-3 text-sm font-medium text-red-800">{message}</p>
+      <AlertCircle size={28} className="text-red-600 dark:text-red-400" aria-hidden="true" />
+      <p className="mt-3 text-sm font-medium text-red-800 dark:text-red-300">{message}</p>
       <button
         type="button"
         onClick={onRetry}
-        className="mt-4 flex items-center gap-1.5 rounded-md border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-100"
+        className="mt-4 flex items-center gap-1.5 rounded-md border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-100 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-950"
       >
         <RotateCcw size={16} aria-hidden="true" />
         Retry
