@@ -4,15 +4,19 @@ import {
   Pencil,
   Plus,
   Search,
+  Trash2
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import {
+  deleteApplication,
   listApplications,
+  type Application,
   type ApplicationStatus,
   type PaginatedApplications,
 } from "../api/applications";
+import ConfirmModal from "../components/ConfirmModal";
 import { EmptyState, ErrorState, Loader } from "../components/AsyncState";
 import { StatusBadge } from "../components/ApplicationUI";
 
@@ -36,6 +40,9 @@ export default function ApplicationList() {
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [requestKey, setRequestKey] = useState(0);
+  const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -93,6 +100,42 @@ export default function ApplicationList() {
     setLoading(true);
     setFailed(false);
     setRequestKey((current) => current + 1);
+  }
+
+  function openDeleteModal(application: Application) {
+    setDeleteError("");
+    setSelectedApplication(application);
+  }
+
+  function closeDeleteModal() {
+    if (deleting) return;
+    setDeleteError("");
+    setSelectedApplication(null);
+  }
+
+  async function handleDelete() {
+    if (!selectedApplication || !data) return;
+
+    setDeleting(true);
+    setDeleteError("");
+
+    try {
+      await deleteApplication(selectedApplication.id);
+
+      const deletedLastRow = data.results.length === 1;
+      setSelectedApplication(null);
+      setLoading(true);
+
+      if (deletedLastRow && page > 1) {
+        setPage((current) => current - 1);
+      } else {
+        setRequestKey((current) => current + 1);
+      }
+    } catch {
+      setDeleteError("Could not delete this application. Please try again.");
+    } finally {
+      setDeleting(false);
+    }
   }
 
   const totalPages = data
@@ -216,6 +259,14 @@ export default function ApplicationList() {
                     <Pencil size={15} aria-hidden="true" />
                     Edit
                   </Link>
+                  <button
+                    type="button"
+                    onClick={() => openDeleteModal(application)}
+                    className="flex items-center gap-1.5 rounded-md border border-red-200 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 size={15} aria-hidden="true" />
+                    Delete
+                  </button>
                 </li>
               ))}
             </ul>
@@ -249,6 +300,13 @@ export default function ApplicationList() {
           </>
         )}
       </div>
+      <ConfirmModal
+        application={selectedApplication}
+        deleting={deleting}
+        error={deleteError}
+        onCancel={closeDeleteModal}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }
