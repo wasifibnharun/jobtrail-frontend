@@ -16,7 +16,12 @@ import ApplicationForm from "./pages/ApplicationForm";
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
