@@ -11,6 +11,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import PlaceholderPage from "./pages/PlaceholderPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
 
 export default function App() {
   return (
@@ -22,10 +23,7 @@ export default function App() {
 
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
-              <Route
-                path="/"
-                element={<PlaceholderPage title="Dashboard" />}
-              />
+              <Route path="/" element={<Dashboard />} />
               <Route
                 path="/applications"
                 element={<PlaceholderPage title="Applications" />}
