@@ -4,10 +4,11 @@ import {
   Pencil,
   Plus,
   Search,
-  Trash2
+  Trash2,
+  CheckCircle2
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import {
   deleteApplication,
@@ -43,6 +44,10 @@ export default function ApplicationList() {
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+  const location = useLocation();
+  const successMessage = (
+    location.state as { message?: string } | null
+  )?.message;
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -163,6 +168,16 @@ export default function ApplicationList() {
           Add application
         </Link>
       </header>
+
+      {successMessage && (
+        <p
+          role="status"
+          className="mt-5 flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800"
+        >
+          <CheckCircle2 size={17} aria-hidden="true" />
+          {successMessage}
+        </p>
+      )}
 
       <section
         aria-label="Application filters"

@@ -8,11 +8,11 @@ import {
 import AuthProvider from "./auth/AuthProvider";
 import AppLayout from "./components/AppLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
-import PlaceholderPage from "./pages/PlaceholderPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ApplicationList from "./pages/ApplicationList";
+import ApplicationForm from "./pages/ApplicationForm";
 
 export default function App() {
   return (
@@ -26,13 +26,10 @@ export default function App() {
             <Route element={<AppLayout />}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/applications" element={<ApplicationList />} />
-              <Route
-                path="/applications/new"
-                element={<PlaceholderPage title="Add application" />}
-              />
+              <Route path="/applications/new" element={<ApplicationForm />} />
               <Route
                 path="/applications/:id/edit"
-                element={<PlaceholderPage title="Edit application" />}
+                element={<ApplicationForm />}
               />
             </Route>
           </Route>
