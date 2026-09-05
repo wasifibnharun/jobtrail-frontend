@@ -38,11 +38,11 @@ function Field({
     <label htmlFor={name} className="block">
       <span className="text-sm font-medium text-[#303b36] dark:text-[#dce5e0]">
         {label}
-        {required && <span className="ml-1 text-red-600">*</span>}
+        {required && <span className="ml-1 text-red-500">*</span>}
       </span>
       {children}
       {error && (
-        <span className="mt-1 block text-sm text-red-600 dark:text-red-400">
+        <span className="mt-1.5 block text-sm text-red-600 dark:text-red-400">
           {error}
         </span>
       )}
@@ -52,12 +52,13 @@ function Field({
 
 const inputClass = (hasError: boolean) =>
   [
-    "mt-2 w-full rounded-md border bg-white px-3 py-2.5 text-[#18201d] outline-none",
-    "focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100",
-    "dark:bg-[#111815] dark:text-[#edf3f0] dark:focus:border-emerald-500 dark:focus:ring-emerald-950",
+    "mt-2 w-full rounded-xl border bg-white/60 px-3.5 py-2.5 text-[#18201d] outline-none",
+    "backdrop-blur-sm transition-all",
+    "focus:border-emerald-500 focus:glow-ring",
+    "dark:bg-[#111815]/60 dark:text-[#edf3f0] dark:focus:border-emerald-500",
     hasError
-      ? "border-red-400 dark:border-red-700"
-      : "border-[#cfd8d3] dark:border-[#435149]",
+      ? "border-red-400/70 dark:border-red-700/60"
+      : "border-[#d0d8d4]/70 dark:border-[#3a4840]/70",
   ].join(" ");
 
 export default function ApplicationFields({

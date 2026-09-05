@@ -37,7 +37,7 @@ export default function ConfirmModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 backdrop-blur-sm animate-fade-in"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget && !deleting) onCancel();
       }}
@@ -47,15 +47,15 @@ export default function ConfirmModal({
         aria-modal="true"
         aria-labelledby="delete-title"
         aria-describedby="delete-description"
-        className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:border dark:border-[#34413b] dark:bg-[#18201d]"
+        className="glass-card dark:glass-card-dark w-full max-w-md rounded-2xl p-6 animate-slide-up"
       >
-        <div className="flex size-10 items-center justify-center rounded-md bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">
+        <div className="flex size-11 items-center justify-center rounded-xl bg-red-100/80 text-red-700 dark:bg-red-950/50 dark:text-red-300">
           <Trash2 size={20} aria-hidden="true" />
         </div>
 
         <h2
           id="delete-title"
-          className="mt-4 text-lg font-semibold text-[#202b26] dark:text-[#edf3f0]"
+          className="mt-4 text-lg font-bold text-[#202b26] dark:text-[#edf3f0]"
         >
           Delete application?
         </h2>
@@ -71,7 +71,7 @@ export default function ConfirmModal({
         {error && (
           <p
             role="alert"
-            className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300"
+            className="mt-4 rounded-xl bg-red-50/80 px-3.5 py-2.5 text-sm text-red-700 backdrop-blur-sm dark:bg-red-950/40 dark:text-red-300"
           >
             {error}
           </p>
@@ -83,7 +83,7 @@ export default function ConfirmModal({
             type="button"
             disabled={deleting}
             onClick={onCancel}
-            className="rounded-md border border-[#cfd8d3] px-4 py-2 text-sm font-medium text-[#36413c] hover:bg-[#f4f6f5] disabled:opacity-50 dark:border-[#435149] dark:text-[#dce5e0] dark:hover:bg-[#26312c]"
+            className="glass dark:glass-dark rounded-xl px-4 py-2.5 text-sm font-medium text-[#36413c] transition-all hover:bg-white/80 active:scale-[0.97] disabled:opacity-50 dark:text-[#dce5e0] dark:hover:bg-white/8"
           >
             Cancel
           </button>
@@ -91,7 +91,7 @@ export default function ConfirmModal({
             type="button"
             disabled={deleting}
             onClick={onConfirm}
-            className="rounded-md bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-800 disabled:opacity-60"
+            className="rounded-xl bg-gradient-to-r from-red-600 to-red-700 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-500/20 transition-all hover:from-red-500 hover:to-red-600 hover:shadow-red-500/30 active:scale-[0.97] disabled:opacity-60"
           >
             {deleting ? "Deleting..." : "Delete"}
           </button>

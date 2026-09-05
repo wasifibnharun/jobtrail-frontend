@@ -158,20 +158,20 @@ export default function ApplicationForm() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-3xl animate-fade-in-up">
       <Link
         to="/applications"
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-[#59645f] hover:text-emerald-700 dark:text-[#aab5af] dark:hover:text-emerald-400"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-[#59645f] transition-colors hover:text-emerald-600 dark:text-[#aab5af] dark:hover:text-emerald-400"
       >
         <ArrowLeft size={16} aria-hidden="true" />
         Back to applications
       </Link>
 
       <header className="mt-5">
-        <h1 className="text-2xl font-semibold text-[#17211d] dark:text-[#edf3f0]">
+        <h1 className="text-2xl font-bold tracking-tight text-[#17211d] dark:text-[#edf3f0]">
           {isEditing ? "Edit application" : "Add application"}
         </h1>
-        <p className="mt-1 text-sm text-[#66716c] dark:text-[#aab5af]">
+        <p className="mt-1.5 text-sm text-[#66716c] dark:text-[#aab5af]">
           {isEditing
             ? "Update the details of this opportunity."
             : "Record a new opportunity in your job search."}
@@ -180,12 +180,12 @@ export default function ApplicationForm() {
 
       <form
         onSubmit={handleSubmit}
-        className="mt-6 rounded-lg border border-[#dce3df] bg-white p-5 shadow-sm dark:border-[#34413b] dark:bg-[#18201d] sm:p-7"
+        className="mt-6 glass-card dark:glass-card-dark rounded-2xl p-5 sm:p-7"
       >
         {errors.detail?.[0] && (
           <p
             role="alert"
-            className="mb-5 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/50 dark:text-red-300"
+            className="mb-5 rounded-xl border border-red-200/60 bg-red-50/80 px-3.5 py-2.5 text-sm text-red-700 backdrop-blur-sm dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300"
           >
             {errors.detail[0]}
           </p>
@@ -197,17 +197,17 @@ export default function ApplicationForm() {
           onChange={updateField}
         />
 
-        <div className="mt-7 flex flex-wrap justify-end gap-3 border-t border-[#e6ebe8] pt-5 dark:border-[#2d3933]">
+        <div className="mt-7 flex flex-wrap justify-end gap-3 border-t border-[#e6ebe8]/50 pt-5 dark:border-[#2d3933]/50">
           <Link
             to="/applications"
-            className="rounded-md border border-[#cfd8d3] px-4 py-2.5 text-sm font-medium text-[#36413c] hover:bg-[#f4f6f5] dark:border-[#435149] dark:text-[#dce5e0] dark:hover:bg-[#26312c]"
+            className="glass dark:glass-dark rounded-xl px-4 py-2.5 text-sm font-medium text-[#36413c] transition-all hover:bg-white/80 active:scale-[0.97] dark:text-[#dce5e0] dark:hover:bg-white/8"
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={saving}
-            className="flex items-center gap-1.5 rounded-md bg-emerald-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-emerald-600 dark:hover:bg-emerald-500"
+            className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2.5 text-sm font-semibold text-white btn-glow transition-all hover:from-emerald-500 hover:to-teal-500 hover:btn-glow-hover active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:from-emerald-600 disabled:hover:to-teal-600 disabled:active:scale-100"
           >
             <Save size={17} aria-hidden="true" />
             {saving ? "Saving..." : "Save application"}

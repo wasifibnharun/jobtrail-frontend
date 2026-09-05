@@ -149,20 +149,20 @@ export default function ApplicationList() {
   const hasFilters = Boolean(search || statusFilter);
 
   return (
-    <div>
+    <div className="animate-fade-in-up">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-[#17211d] dark:text-[#edf3f0]">
+          <h1 className="text-2xl font-bold tracking-tight text-[#17211d] dark:text-[#edf3f0]">
             Applications
           </h1>
-          <p className="mt-1 text-sm text-[#66716c] dark:text-[#aab5af]">
+          <p className="mt-1.5 text-sm text-[#66716c] dark:text-[#aab5af]">
             Search and manage your job opportunities.
           </p>
         </div>
 
         <Link
           to="/applications/new"
-          className="flex items-center gap-1.5 rounded-md bg-emerald-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500"
+          className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2.5 text-sm font-semibold text-white btn-glow transition-all hover:from-emerald-500 hover:to-teal-500 hover:btn-glow-hover active:scale-[0.97]"
         >
           <Plus size={17} aria-hidden="true" />
           Add application
@@ -172,7 +172,7 @@ export default function ApplicationList() {
       {successMessage && (
         <p
           role="status"
-          className="mt-5 flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-300"
+          className="mt-5 flex items-center gap-2 rounded-xl border border-emerald-200/60 bg-emerald-50/80 px-3.5 py-2.5 text-sm text-emerald-800 backdrop-blur-sm dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-300"
         >
           <CheckCircle2 size={17} aria-hidden="true" />
           {successMessage}
@@ -181,13 +181,13 @@ export default function ApplicationList() {
 
       <section
         aria-label="Application filters"
-        className="mt-7 grid gap-3 border-y border-[#dce3df] py-4 dark:border-[#34413b] sm:grid-cols-[minmax(0,1fr)_220px]"
+        className="mt-7 glass dark:glass-dark grid gap-3 rounded-2xl p-4 sm:grid-cols-[minmax(0,1fr)_220px]"
       >
         <label className="relative">
           <span className="sr-only">Search applications</span>
           <Search
             size={18}
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#7b8781] dark:text-[#97a49d]"
+            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7b8781] dark:text-[#97a49d]"
             aria-hidden="true"
           />
           <input
@@ -195,7 +195,7 @@ export default function ApplicationList() {
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
             placeholder="Search company or position"
-            className="w-full rounded-md border border-[#cfd8d3] bg-white py-2.5 pl-10 pr-3 text-[#18201d] outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 dark:border-[#435149] dark:bg-[#111815] dark:text-[#edf3f0] dark:placeholder:text-[#77837d] dark:focus:border-emerald-500 dark:focus:ring-emerald-950"
+            className="w-full rounded-xl border border-[#d0d8d4]/70 bg-white/60 py-2.5 pl-10 pr-3 text-[#18201d] outline-none backdrop-blur-sm transition-all placeholder:text-[#9ca5a0] focus:border-emerald-500 focus:glow-ring dark:border-[#3a4840]/70 dark:bg-[#111815]/60 dark:text-[#edf3f0] dark:placeholder:text-[#6b7a73] dark:focus:border-emerald-500"
           />
         </label>
 
@@ -206,7 +206,7 @@ export default function ApplicationList() {
             onChange={(event) =>
               changeStatus(event.target.value as ApplicationStatus | "")
             }
-            className="w-full rounded-md border border-[#cfd8d3] bg-white px-3 py-2.5 text-[#18201d] outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 dark:border-[#435149] dark:bg-[#111815] dark:text-[#edf3f0] dark:focus:border-emerald-500 dark:focus:ring-emerald-950"
+            className="w-full rounded-xl border border-[#d0d8d4]/70 bg-white/60 px-3 py-2.5 text-[#18201d] outline-none backdrop-blur-sm transition-all focus:border-emerald-500 focus:glow-ring dark:border-[#3a4840]/70 dark:bg-[#111815]/60 dark:text-[#edf3f0] dark:focus:border-emerald-500"
           >
             <option value="">All statuses</option>
             <option value="WISHLIST">Wishlist</option>
@@ -243,14 +243,15 @@ export default function ApplicationList() {
           />
         ) : (
           <>
-            <ul className="divide-y divide-[#e6ebe8] overflow-hidden rounded-lg border border-[#dce3df] bg-white dark:divide-[#2d3933] dark:border-[#34413b] dark:bg-[#18201d]">
-              {data.results.map((application) => (
+            <ul className="glass-card dark:glass-card-dark divide-y divide-[#e6ebe8]/50 overflow-hidden rounded-2xl dark:divide-[#2d3933]/50">
+              {data.results.map((application, index) => (
                 <li
                   key={application.id}
-                  className="flex flex-wrap items-center gap-3 px-4 py-4 transition-colors dark:hover:bg-[#222c27]"
+                  className="flex flex-wrap items-center gap-3 px-5 py-4 transition-all hover:bg-white/40 dark:hover:bg-white/5 animate-fade-in-up"
+                  style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <div className="min-w-0 flex-1 basis-52">
-                    <p className="truncate font-medium text-[#202b26] dark:text-[#edf3f0]">
+                    <p className="truncate font-semibold text-[#202b26] dark:text-[#edf3f0]">
                       {application.position}
                     </p>
                     <p className="truncate text-sm text-[#66716c] dark:text-[#aab5af]">
@@ -261,7 +262,7 @@ export default function ApplicationList() {
                   <StatusBadge status={application.status} />
 
                   <div className="w-full text-sm text-[#66716c] dark:text-[#aab5af] sm:w-36">
-                    <span className="mr-1 text-xs uppercase text-[#87918c] dark:text-[#87958e]">
+                    <span className="mr-1 text-xs uppercase tracking-wider text-[#87918c] dark:text-[#87958e]">
                       Applied
                     </span>
                     {formatDate(application.applied_on)}
@@ -269,7 +270,7 @@ export default function ApplicationList() {
 
                   <Link
                     to={`/applications/${application.id}/edit`}
-                    className="flex items-center gap-1.5 rounded-md border border-[#cfd8d3] px-3 py-2 text-sm font-medium text-[#36413c] hover:bg-[#f4f6f5] dark:border-[#435149] dark:text-[#dce5e0] dark:hover:bg-[#2a352f]"
+                    className="glass dark:glass-dark flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-[#36413c] transition-all hover:bg-white/80 active:scale-[0.97] dark:text-[#dce5e0] dark:hover:bg-white/8"
                   >
                     <Pencil size={15} aria-hidden="true" />
                     Edit
@@ -277,7 +278,7 @@ export default function ApplicationList() {
                   <button
                     type="button"
                     onClick={() => openDeleteModal(application)}
-                    className="flex items-center gap-1.5 rounded-md border border-red-200 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 dark:border-red-900 dark:text-red-300 dark:hover:bg-red-950/50"
+                    className="flex items-center gap-1.5 rounded-lg border border-red-200/60 bg-red-50/60 px-3 py-2 text-sm font-medium text-red-700 backdrop-blur-sm transition-all hover:bg-red-100/80 active:scale-[0.97] dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-300 dark:hover:bg-red-950/50"
                   >
                     <Trash2 size={15} aria-hidden="true" />
                     Delete
@@ -296,7 +297,7 @@ export default function ApplicationList() {
                   type="button"
                   disabled={page <= 1}
                   onClick={() => changePage(page - 1)}
-                  className="flex items-center gap-1 rounded-md border border-[#cfd8d3] bg-white px-3 py-2 text-sm font-medium hover:bg-[#f4f6f5] disabled:cursor-not-allowed disabled:opacity-50 dark:border-[#435149] dark:bg-[#18201d] dark:text-[#dce5e0] dark:hover:bg-[#26312c]"
+                  className="glass dark:glass-dark flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:bg-white/80 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 dark:text-[#dce5e0] dark:hover:bg-white/8"
                 >
                   <ChevronLeft size={16} aria-hidden="true" />
                   Previous
@@ -305,7 +306,7 @@ export default function ApplicationList() {
                   type="button"
                   disabled={page >= totalPages}
                   onClick={() => changePage(page + 1)}
-                  className="flex items-center gap-1 rounded-md border border-[#cfd8d3] bg-white px-3 py-2 text-sm font-medium hover:bg-[#f4f6f5] disabled:cursor-not-allowed disabled:opacity-50 dark:border-[#435149] dark:bg-[#18201d] dark:text-[#dce5e0] dark:hover:bg-[#26312c]"
+                  className="glass dark:glass-dark flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:bg-white/80 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 dark:text-[#dce5e0] dark:hover:bg-white/8"
                 >
                   Next
                   <ChevronRight size={16} aria-hidden="true" />

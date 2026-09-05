@@ -31,7 +31,7 @@ export default function ThemeToggle() {
       onClick={toggleTheme}
       aria-label={nextThemeLabel}
       title={nextThemeLabel}
-      className="flex size-10 shrink-0 items-center justify-center rounded-md border border-[#cfd8d3] bg-white text-[#36413c] transition-colors hover:bg-[#f1f4f2] dark:border-[#3b4842] dark:bg-[#19211d] dark:text-[#dce5e0] dark:hover:bg-[#26312c]"
+      className="glass dark:glass-dark flex size-10 shrink-0 items-center justify-center rounded-lg text-[#36413c] transition-all hover:bg-white/80 hover:scale-105 active:scale-95 dark:text-[#dce5e0] dark:hover:bg-white/8"
     >
       {theme === "light" ? (
         <Moon size={18} aria-hidden="true" />
