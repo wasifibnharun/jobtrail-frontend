@@ -2,6 +2,13 @@
 
 JobTrail is a private job application tracker for organizing opportunities through the Wishlist, Applied, Interview, Offer, and Rejected stages. This repository contains the React frontend; all displayed application data is loaded from the JobTrail API.
 
+## Live Deployment
+
+- Application: [jobtrail-bice.vercel.app](https://jobtrail-bice.vercel.app/)
+- Backend API: [jobtrail-ghfp.onrender.com/api/](https://jobtrail-ghfp.onrender.com/api/)
+- Demo username: `demo`
+- Demo password: `DemoPass123!`
+
 ## Related Repository
 
 - [JobTrail Backend](https://github.com/wasifibnharun/jobtrail-backend)
