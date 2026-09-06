@@ -1,4 +1,4 @@
-import { BriefcaseBusiness, LogOut, Plus } from "lucide-react";
+import { BriefcaseBusiness, Columns3, LogOut, Plus } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle";
 
@@ -43,6 +43,15 @@ export default function Navbar() {
           </NavLink>
           <NavLink to="/applications" className={navClass}>
             Applications
+          </NavLink>
+          <NavLink
+            to="/board"
+            className={({ isActive }) =>
+              [navClass({ isActive }), "flex items-center gap-1.5"].join(" ")
+            }
+          >
+            <Columns3 size={16} aria-hidden="true" />
+            Board
           </NavLink>
           <NavLink
             to="/applications/new"

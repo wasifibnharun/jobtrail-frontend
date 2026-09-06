@@ -97,3 +97,8 @@ export const getStats = () =>
   client
     .get<ApplicationStats>("/stats/")
     .then((response) => response.data);
+
+export const getBoardApplications = () =>
+  client
+    .get<Application[]>("/applications/board/")
+    .then((response) => response.data);

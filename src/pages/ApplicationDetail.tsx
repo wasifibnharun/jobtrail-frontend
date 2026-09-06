@@ -47,11 +47,7 @@ export default function ApplicationDetail() {
   const [requestKey, setRequestKey] = useState(0);
 
   useEffect(() => {
-    if (!id) {
-      setFailed(true);
-      setLoading(false);
-      return;
-    }
+    if (!id) return;
 
     let cancelled = false;
 
@@ -77,6 +73,15 @@ export default function ApplicationDetail() {
       cancelled = true;
     };
   }, [id, requestKey]);
+
+  if (!id) {
+    return (
+      <ErrorState
+        message="This application URL is invalid."
+        onRetry={() => window.location.assign("/applications")}
+      />
+    );
+  }
 
   if (loading) {
     return <Loader label="Loading application..." />;
