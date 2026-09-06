@@ -4,11 +4,13 @@ import {
   useState,
   type PropsWithChildren,
 } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { login } from "../api/auth";
 import { AuthContext } from "./auth-context";
 
 export default function AuthProvider({ children }: PropsWithChildren) {
+  const queryClient = useQueryClient();
   const [accessToken, setAccessToken] = useState<string | null>(
     () => localStorage.getItem("access"),
   );
@@ -24,10 +26,11 @@ export default function AuthProvider({ children }: PropsWithChildren) {
       localStorage.setItem("refresh", tokens.refresh);
       localStorage.setItem("username", credentials.username);
 
+      queryClient.clear();
       setAccessToken(tokens.access);
       setUsername(credentials.username);
     },
-    [],
+    [queryClient],
   );
 
   const signOut = useCallback(() => {
@@ -35,9 +38,10 @@ export default function AuthProvider({ children }: PropsWithChildren) {
     localStorage.removeItem("refresh");
     localStorage.removeItem("username");
 
+    queryClient.clear();
     setAccessToken(null);
     setUsername(null);
-  }, []);
+  }, [queryClient]);
 
   const value = useMemo(
     () => ({

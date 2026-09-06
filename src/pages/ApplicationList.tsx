@@ -5,11 +5,19 @@ import {
   Plus,
   Search,
   Trash2,
-  CheckCircle2,
-  Eye
+  Eye,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
+import {
+  Link,
+  useSearchParams,
+} from "react-router-dom";
+import toast from "react-hot-toast";
 
 import {
   deleteApplication,
@@ -33,114 +41,151 @@ function formatDate(value: string | null) {
 }
 
 export default function ApplicationList() {
-  const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] =
-    useState<ApplicationStatus | "">("");
-  const [page, setPage] = useState(1);
-  const [data, setData] = useState<PaginatedApplications | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [failed, setFailed] = useState(false);
-  const [requestKey, setRequestKey] = useState(0);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const search = searchParams.get("search")?.trim() ?? "";
+  const statusValue = searchParams.get("status") ?? "";
+  const statusFilter = [
+    "WISHLIST",
+    "APPLIED",
+    "INTERVIEW",
+    "OFFER",
+    "REJECTED",
+  ].includes(statusValue)
+    ? (statusValue as ApplicationStatus)
+    : "";
+  const requestedPage = Number(searchParams.get("page"));
+  const page = Number.isInteger(requestedPage) && requestedPage > 0
+    ? requestedPage
+    : 1;
+  const searchTimeout = useRef<number | undefined>(undefined);
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
-  const [deleting, setDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState("");
-  const location = useLocation();
-  const successMessage = (
-    location.state as { message?: string } | null
-  )?.message;
+  const queryClient = useQueryClient();
+  const queryKey = [
+    "applications",
+    { search, status: statusFilter, page },
+  ] as const;
+  const applicationsQuery = useQuery({
+    queryKey,
+    queryFn: () =>
+      listApplications({
+        search: search || undefined,
+        status: statusFilter || undefined,
+        ordering: "-created_at",
+        page,
+      }),
+    placeholderData: (previous) => previous,
+  });
+  const data = applicationsQuery.data;
+  const deleteMutation = useMutation({
+    mutationFn: deleteApplication,
+    onMutate: async (applicationId) => {
+      await queryClient.cancelQueries({ queryKey: ["applications"] });
+      const previous = queryClient.getQueryData<PaginatedApplications>(queryKey);
 
-  useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      const nextSearch = searchInput.trim();
+      queryClient.setQueryData<PaginatedApplications>(queryKey, (current) =>
+        current
+          ? {
+              ...current,
+              count: Math.max(0, current.count - 1),
+              results: current.results.filter(
+                (application) => application.id !== applicationId,
+              ),
+            }
+          : current,
+      );
 
-      if (nextSearch !== search) {
-        setLoading(true);
-        setPage(1);
-        setSearch(nextSearch);
+      return { previous };
+    },
+    onError: (_error, _applicationId, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(queryKey, context.previous);
       }
-    }, 350);
-
-    return () => window.clearTimeout(timeout);
-  }, [search, searchInput]);
+      toast.error("Could not delete the application. The row was restored.");
+    },
+    onSuccess: () => toast.success("Application deleted."),
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: ["applications"] });
+      void queryClient.invalidateQueries({ queryKey: ["board"] });
+      void queryClient.invalidateQueries({ queryKey: ["stats"] });
+    },
+  });
 
   useEffect(() => {
-    let cancelled = false;
+    return () => window.clearTimeout(searchTimeout.current);
+  }, [search]);
 
-    listApplications({
-      search: search || undefined,
-      status: statusFilter || undefined,
-      ordering: "-created_at",
-      page,
-    })
-      .then((response) => {
-        if (!cancelled) {
-          setData(response);
-          setFailed(false);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) setFailed(true);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+  function scheduleSearch(value: string) {
+    window.clearTimeout(searchTimeout.current);
+    searchTimeout.current = window.setTimeout(() => {
+      const nextSearch = value.trim();
 
-    return () => {
-      cancelled = true;
-    };
-  }, [page, requestKey, search, statusFilter]);
+      if (nextSearch === search) return;
+
+      const nextParams = new URLSearchParams(searchParams);
+
+      if (nextSearch) {
+        nextParams.set("search", nextSearch);
+      } else {
+        nextParams.delete("search");
+      }
+
+      nextParams.delete("page");
+      setSearchParams(nextParams, { replace: true });
+    }, 400);
+  }
 
   function changeStatus(value: ApplicationStatus | "") {
-    setLoading(true);
-    setStatusFilter(value);
-    setPage(1);
+    const nextParams = new URLSearchParams(searchParams);
+
+    if (value) {
+      nextParams.set("status", value);
+    } else {
+      nextParams.delete("status");
+    }
+
+    nextParams.delete("page");
+    setSearchParams(nextParams);
   }
 
   function changePage(nextPage: number) {
-    setLoading(true);
-    setPage(nextPage);
+    const nextParams = new URLSearchParams(searchParams);
+
+    if (nextPage > 1) {
+      nextParams.set("page", String(nextPage));
+    } else {
+      nextParams.delete("page");
+    }
+
+    setSearchParams(nextParams);
   }
 
   function retry() {
-    setLoading(true);
-    setFailed(false);
-    setRequestKey((current) => current + 1);
+    void applicationsQuery.refetch();
   }
 
   function openDeleteModal(application: Application) {
-    setDeleteError("");
     setSelectedApplication(application);
   }
 
   function closeDeleteModal() {
-    if (deleting) return;
-    setDeleteError("");
+    if (deleteMutation.isPending) return;
     setSelectedApplication(null);
   }
 
   async function handleDelete() {
     if (!selectedApplication || !data) return;
 
-    setDeleting(true);
-    setDeleteError("");
+    const deletedLastRow = data.results.length === 1;
 
     try {
-      await deleteApplication(selectedApplication.id);
-
-      const deletedLastRow = data.results.length === 1;
+      await deleteMutation.mutateAsync(selectedApplication.id);
       setSelectedApplication(null);
-      setLoading(true);
 
       if (deletedLastRow && page > 1) {
-        setPage((current) => current - 1);
-      } else {
-        setRequestKey((current) => current + 1);
+        changePage(page - 1);
       }
     } catch {
-      setDeleteError("Could not delete this application. Please try again.");
-    } finally {
-      setDeleting(false);
+      // The mutation restores cached data and displays the error toast.
     }
   }
 
@@ -170,16 +215,6 @@ export default function ApplicationList() {
         </Link>
       </header>
 
-      {successMessage && (
-        <p
-          role="status"
-          className="mt-5 flex items-center gap-2 rounded-xl border border-emerald-200/60 bg-emerald-50/80 px-3.5 py-2.5 text-sm text-emerald-800 backdrop-blur-sm dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-300"
-        >
-          <CheckCircle2 size={17} aria-hidden="true" />
-          {successMessage}
-        </p>
-      )}
-
       <section
         aria-label="Application filters"
         className="mt-7 glass dark:glass-dark grid gap-3 rounded-2xl p-4 sm:grid-cols-[minmax(0,1fr)_220px]"
@@ -192,9 +227,10 @@ export default function ApplicationList() {
             aria-hidden="true"
           />
           <input
+            key={search}
             type="search"
-            value={searchInput}
-            onChange={(event) => setSearchInput(event.target.value)}
+            defaultValue={search}
+            onChange={(event) => scheduleSearch(event.target.value)}
             placeholder="Search company or position"
             className="w-full rounded-xl border border-[#d0d8d4]/70 bg-white/60 py-2.5 pl-10 pr-3 text-[#18201d] outline-none backdrop-blur-sm transition-all placeholder:text-[#9ca5a0] focus:border-emerald-500 focus:glow-ring dark:border-[#3a4840]/70 dark:bg-[#111815]/60 dark:text-[#edf3f0] dark:placeholder:text-[#6b7a73] dark:focus:border-emerald-500"
           />
@@ -220,9 +256,9 @@ export default function ApplicationList() {
       </section>
 
       <div className="mt-5">
-        {loading ? (
+        {applicationsQuery.isPending ? (
           <Loader label="Loading applications..." />
-        ) : failed || !data ? (
+        ) : applicationsQuery.isError || !data ? (
           <ErrorState
             message="Could not load your applications."
             onRetry={retry}
@@ -328,8 +364,8 @@ export default function ApplicationList() {
       </div>
       <ConfirmModal
         application={selectedApplication}
-        deleting={deleting}
-        error={deleteError}
+        deleting={deleteMutation.isPending}
+        error=""
         onCancel={closeDeleteModal}
         onConfirm={handleDelete}
       />

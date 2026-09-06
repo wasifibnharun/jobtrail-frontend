@@ -1,13 +1,16 @@
 import {
   CalendarClock,
-  MapPin,
-  Phone,
-  Video,
+  FilePenLine,
+  Send,
+  Sparkles,
 } from "lucide-react";
+import type { ReactNode } from "react";
 
+import type { Application } from "../api/applications";
 import type { Interview } from "../api/interviews";
 
 interface Props {
+  application: Application;
   interviews: Interview[];
 }
 
@@ -27,72 +30,85 @@ function formatDate(value: string) {
   }).format(new Date(value));
 }
 
-function ModeIcon({ mode }: Pick<Interview, "mode">) {
-  if (mode === "VIDEO") {
-    return <Video size={16} aria-hidden="true" />;
-  }
-
-  if (mode === "PHONE") {
-    return <Phone size={16} aria-hidden="true" />;
-  }
-
-  return <MapPin size={16} aria-hidden="true" />;
+interface Activity {
+  id: string;
+  title: string;
+  detail: string;
+  date: Date;
+  icon: ReactNode;
+  result?: Interview["result"];
 }
 
-export default function InterviewTimeline({ interviews }: Props) {
-  if (interviews.length === 0) {
-    return (
-      <div className="py-8 text-center">
-        <CalendarClock
-          size={30}
-          className="mx-auto text-[#8b9690]"
-          aria-hidden="true"
-        />
-        <p className="mt-3 font-medium text-[#35413b] dark:text-[#dce5e0]">
-          No interviews scheduled
-        </p>
-        <p className="mt-1 text-sm text-[#718079] dark:text-[#98a69f]">
-          Interview rounds will appear here chronologically.
-        </p>
-      </div>
-    );
+export default function InterviewTimeline({ application, interviews }: Props) {
+  const activities: Activity[] = [
+    {
+      id: "created",
+      title: "Record created",
+      detail: `${application.position} added to JobTrail`,
+      date: new Date(application.created_at),
+      icon: <Sparkles size={15} aria-hidden="true" />,
+    },
+  ];
+
+  if (application.applied_on) {
+    activities.push({
+      id: "applied",
+      title: "Application submitted",
+      detail: `Applied to ${application.company}`,
+      date: new Date(`${application.applied_on}T12:00:00`),
+      icon: <Send size={15} aria-hidden="true" />,
+    });
   }
+
+  interviews.forEach((interview) => activities.push({
+    id: `interview-${interview.id}`,
+    title: interview.round_name,
+    detail: `${interview.mode.toLowerCase()} interview${interview.notes ? `: ${interview.notes}` : ""}`,
+    date: new Date(interview.scheduled_at),
+    icon: <CalendarClock size={15} aria-hidden="true" />,
+    result: interview.result,
+  }));
+
+  if (application.updated_at !== application.created_at) {
+    activities.push({
+      id: "updated",
+      title: "Record updated",
+      detail: `Current status: ${application.status.toLowerCase()}`,
+      date: new Date(application.updated_at),
+      icon: <FilePenLine size={15} aria-hidden="true" />,
+    });
+  }
+
+  activities.sort((first, second) => first.date.getTime() - second.date.getTime());
 
   return (
     <ol className="relative ml-2 border-l border-[#d8e0dc] dark:border-[#35423b]">
-      {interviews.map((interview) => (
-        <li key={interview.id} className="relative pb-7 pl-7 last:pb-0">
-          <span className="absolute -left-2 top-1 size-4 rounded-full border-4 border-white bg-emerald-600 dark:border-[#151d19]" />
+      {activities.map((activity) => (
+        <li key={activity.id} className="relative pb-7 pl-7 last:pb-0">
+          <span className="absolute -left-3 top-0 flex size-6 items-center justify-center rounded-full border-2 border-white bg-emerald-600 text-white dark:border-[#151d19]">
+            {activity.icon}
+          </span>
 
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <h3 className="font-semibold text-[#202b26] dark:text-[#edf3f0]">
-                {interview.round_name}
+                {activity.title}
               </h3>
               <p className="mt-1 text-sm text-[#66716c] dark:text-[#aab5af]">
-                {formatDate(interview.scheduled_at)}
+                {formatDate(activity.date.toISOString())}
               </p>
             </div>
 
-            <span
-              className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-                resultStyles[interview.result]
-              }`}
-            >
-              {interview.result.toLowerCase()}
-            </span>
+            {activity.result && (
+              <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${resultStyles[activity.result]}`}>
+                {activity.result.toLowerCase()}
+              </span>
+            )}
           </div>
 
-          <p className="mt-2 flex items-center gap-1.5 text-sm text-[#53615a] dark:text-[#b4c0ba]">
-            <ModeIcon mode={interview.mode} />
-            {interview.mode.toLowerCase()}
+          <p className="mt-2 whitespace-pre-wrap text-sm text-[#53615a] dark:text-[#b4c0ba]">
+            {activity.detail}
           </p>
-
-          {interview.notes && (
-            <p className="mt-2 whitespace-pre-wrap text-sm text-[#66716c] dark:text-[#aab5af]">
-              {interview.notes}
-            </p>
-          )}
         </li>
       ))}
     </ol>

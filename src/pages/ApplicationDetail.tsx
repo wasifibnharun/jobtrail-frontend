@@ -4,16 +4,14 @@ import {
   ExternalLink,
   Pencil,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
 
 import {
   getApplication,
-  type Application,
 } from "../api/applications";
 import {
   listApplicationInterviews,
-  type Interview,
 } from "../api/interviews";
 import { StatusBadge } from "../components/ApplicationUI";
 import { ErrorState, Loader } from "../components/AsyncState";
@@ -24,7 +22,7 @@ function formatDate(value: string | null) {
 
   return new Intl.DateTimeFormat("en", {
     dateStyle: "medium",
-  }).format(new Date(value));
+  }).format(new Date(`${value}T00:00:00`));
 }
 
 function formatSalary(value: number | null) {
@@ -39,40 +37,18 @@ function formatSalary(value: number | null) {
 
 export default function ApplicationDetail() {
   const { id } = useParams();
-  const [application, setApplication] =
-    useState<Application | null>(null);
-  const [interviews, setInterviews] = useState<Interview[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [failed, setFailed] = useState(false);
-  const [requestKey, setRequestKey] = useState(0);
-
-  useEffect(() => {
-    if (!id) return;
-
-    let cancelled = false;
-
-    Promise.all([
-      getApplication(id),
-      listApplicationInterviews(id),
-    ])
-      .then(([applicationData, interviewData]) => {
-        if (cancelled) return;
-
-        setApplication(applicationData);
-        setInterviews(interviewData.results);
-        setFailed(false);
-      })
-      .catch(() => {
-        if (!cancelled) setFailed(true);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id, requestKey]);
+  const applicationQuery = useQuery({
+    queryKey: ["application", id],
+    queryFn: () => getApplication(id!),
+    enabled: Boolean(id),
+  });
+  const interviewsQuery = useQuery({
+    queryKey: ["interviews", { application: id }],
+    queryFn: () => listApplicationInterviews(id!),
+    enabled: Boolean(id),
+  });
+  const application = applicationQuery.data;
+  const interviews = interviewsQuery.data?.results ?? [];
 
   if (!id) {
     return (
@@ -83,17 +59,21 @@ export default function ApplicationDetail() {
     );
   }
 
-  if (loading) {
+  if (applicationQuery.isPending || interviewsQuery.isPending) {
     return <Loader label="Loading application..." />;
   }
 
-  if (failed || !application) {
+  if (
+    applicationQuery.isError
+    || interviewsQuery.isError
+    || !application
+  ) {
     return (
       <ErrorState
         message="Could not load this application."
         onRetry={() => {
-          setLoading(true);
-          setRequestKey((current) => current + 1);
+          void applicationQuery.refetch();
+          void interviewsQuery.refetch();
         }}
       />
     );
@@ -176,9 +156,12 @@ export default function ApplicationDetail() {
 
       <section className="mt-5 glass-card dark:glass-card-dark rounded-2xl p-5 sm:p-6">
         <h2 className="mb-6 text-lg font-bold dark:text-[#edf3f0]">
-          Interview timeline
+          Activity timeline
         </h2>
-        <InterviewTimeline interviews={interviews} />
+        <InterviewTimeline
+          application={application}
+          interviews={interviews}
+        />
       </section>
     </div>
   );

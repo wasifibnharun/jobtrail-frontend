@@ -7,17 +7,16 @@ import {
   Send,
   Trophy,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 
 import {
   getStats,
   listApplications,
-  type Application,
-  type ApplicationStats,
 } from "../api/applications";
 import { ErrorState, EmptyState, Loader } from "../components/AsyncState";
 import { StatCard, StatusBadge } from "../components/ApplicationUI";
+import DashboardCharts from "../components/DashboardCharts";
 
 function formatDate(value: string | null) {
   if (!value) return "No applied date";
@@ -30,47 +29,27 @@ function formatDate(value: string | null) {
 }
 
 export default function Dashboard() {
-  const [stats, setStats] = useState<ApplicationStats | null>(null);
-  const [recent, setRecent] = useState<Application[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [failed, setFailed] = useState(false);
-  const [requestKey, setRequestKey] = useState(0);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    Promise.all([
-      getStats(),
-      listApplications({ ordering: "-created_at" }),
-    ])
-      .then(([statsData, applicationsData]) => {
-        if (cancelled) return;
-        setStats(statsData);
-        setRecent(applicationsData.results.slice(0, 5));
-      })
-      .catch(() => {
-        if (!cancelled) setFailed(true);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [requestKey]);
+  const statsQuery = useQuery({
+    queryKey: ["stats"],
+    queryFn: getStats,
+  });
+  const applicationsQuery = useQuery({
+    queryKey: ["applications", "recent"],
+    queryFn: () => listApplications({ ordering: "-created_at" }),
+  });
+  const stats = statsQuery.data;
+  const recent = applicationsQuery.data?.results.slice(0, 5) ?? [];
 
   function retry() {
-    setLoading(true);
-    setFailed(false);
-    setRequestKey((current) => current + 1);
+    void statsQuery.refetch();
+    void applicationsQuery.refetch();
   }
 
-  if (loading) {
+  if (statsQuery.isPending || applicationsQuery.isPending) {
     return <Loader label="Loading dashboard..." />;
   }
 
-  if (failed || !stats) {
+  if (statsQuery.isError || applicationsQuery.isError || !stats) {
     return (
       <ErrorState
         message="Could not load your dashboard."
@@ -154,6 +133,8 @@ export default function Dashboard() {
         ))}
       </section>
 
+      <DashboardCharts stats={stats} />
+
       <section className="mt-9">
         <div className="mb-4 flex items-center justify-between gap-4">
           <div>
@@ -190,7 +171,7 @@ export default function Dashboard() {
                 style={{ animationDelay: `${(index + 5) * 60}ms` }}
               >
                 <Link
-                  to={`/applications/${application.id}/edit`}
+                  to={`/applications/${application.id}`}
                   className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 py-4 transition-all hover:bg-white/40 dark:hover:bg-white/5 sm:grid-cols-[minmax(0,1fr)_auto_160px_auto]"
                 >
                   <div className="min-w-0">

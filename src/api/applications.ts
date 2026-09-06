@@ -65,6 +65,10 @@ export interface ApplicationStats {
   interview: number;
   offer: number;
   rejected: number;
+  monthly: Array<{
+    month: string;
+    count: number;
+  }>;
 }
 
 export const listApplications = (params?: ApplicationQuery) =>

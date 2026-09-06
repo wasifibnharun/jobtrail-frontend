@@ -1,5 +1,7 @@
 import axios from "axios";
+import { useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Save } from "lucide-react";
+import toast from "react-hot-toast";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
@@ -31,6 +33,7 @@ const emptyValues: ApplicationFormValues = {
 export default function ApplicationForm() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const isEditing = Boolean(id);
 
   const [values, setValues] =
@@ -46,7 +49,10 @@ export default function ApplicationForm() {
 
     let cancelled = false;
 
-    getApplication(id)
+    queryClient.fetchQuery({
+      queryKey: ["application", id],
+      queryFn: () => getApplication(id),
+    })
       .then((application) => {
         if (cancelled) return;
 
@@ -75,7 +81,7 @@ export default function ApplicationForm() {
     return () => {
       cancelled = true;
     };
-  }, [id, requestKey]);
+  }, [id, queryClient, requestKey]);
 
   function updateField(
     field: keyof ApplicationFormValues,
@@ -116,18 +122,23 @@ export default function ApplicationForm() {
 
     try {
       if (id) {
-        await updateApplication(id, payload);
+        const updated = await updateApplication(id, payload);
+        queryClient.setQueryData(["application", id], updated);
       } else {
         await createApplication(payload);
       }
 
-      navigate("/applications", {
-        state: {
-          message: isEditing
-            ? "Application updated successfully."
-            : "Application added successfully.",
-        },
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["applications"] }),
+        queryClient.invalidateQueries({ queryKey: ["board"] }),
+        queryClient.invalidateQueries({ queryKey: ["stats"] }),
+      ]);
+      toast.success(
+        isEditing
+          ? "Application updated successfully."
+          : "Application added successfully.",
+      );
+      navigate("/applications");
     } catch (requestError) {
       if (
         axios.isAxiosError(requestError) &&

@@ -1,7 +1,6 @@
 import {
   AlertCircle,
   Inbox,
-  LoaderCircle,
   Plus,
   RotateCcw,
 } from "lucide-react";
@@ -11,14 +10,20 @@ export function Loader({ label = "Loading..." }: { label?: string }) {
   return (
     <div
       role="status"
-      className="flex min-h-48 items-center justify-center gap-2.5 text-sm text-[#66716c] dark:text-[#aab5af]"
+      aria-label={label}
+      className="min-h-48 animate-pulse space-y-3 py-3"
     >
-      <LoaderCircle
-        className="animate-spin text-emerald-500"
-        size={20}
-        aria-hidden="true"
-      />
-      {label}
+      <span className="sr-only">{label}</span>
+      <div className="h-5 w-40 rounded bg-[#dce4e0] dark:bg-[#2c3932]" />
+      <div className="h-24 rounded-lg bg-[#e7ece9] dark:bg-[#202b25]" />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            key={index}
+            className="h-20 rounded-lg bg-[#e7ece9] dark:bg-[#202b25]"
+          />
+        ))}
+      </div>
     </div>
   );
 }

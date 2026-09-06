@@ -1,5 +1,6 @@
 import axios from "axios";
 import { BriefcaseBusiness, UserPlus } from "lucide-react";
+import toast from "react-hot-toast";
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ThemeToggle from "../components/ThemeToggle";
@@ -42,12 +43,8 @@ export default function Register() {
 
     try {
       await registerRequest(form);
-      navigate("/login", {
-        replace: true,
-        state: {
-          message: "Account created successfully. You can now sign in.",
-        },
-      });
+      toast.success("Account created successfully. You can now sign in.");
+      navigate("/login", { replace: true });
     } catch (requestError) {
       if (
         axios.isAxiosError(requestError) &&

@@ -7,8 +7,13 @@ import {
   useSensors,
   type DragEndEvent,
 } from "@dnd-kit/core";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { Columns3 } from "lucide-react";
-import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 import {
   getBoardApplications,
@@ -30,38 +35,54 @@ const COLUMNS: Array<{ status: ApplicationStatus; label: string }> = [
 const STATUSES = new Set(COLUMNS.map(({ status }) => status));
 
 export default function KanbanBoard() {
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [failed, setFailed] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState("");
-  const [requestKey, setRequestKey] = useState(0);
+  const queryClient = useQueryClient();
+  const boardQuery = useQuery({
+    queryKey: ["board"],
+    queryFn: getBoardApplications,
+  });
+  const applications = boardQuery.data ?? [];
+  const statusMutation = useMutation({
+    mutationFn: ({
+      id,
+      status,
+    }: {
+      id: number;
+      status: ApplicationStatus;
+    }) => updateApplication(id, { status }),
+    onMutate: async ({ id, status }) => {
+      await queryClient.cancelQueries({ queryKey: ["board"] });
+      const previous = queryClient.getQueryData<Application[]>(["board"]);
+
+      queryClient.setQueryData<Application[]>(["board"], (current = []) =>
+        current.map((item) =>
+          item.id === id ? { ...item, status } : item,
+        ),
+      );
+
+      return { previous };
+    },
+    onError: (_error, _variables, context) => {
+      queryClient.setQueryData(["board"], context?.previous ?? []);
+      toast.error("Could not update the status. The move was undone.");
+    },
+    onSuccess: (updated) => {
+      queryClient.setQueryData<Application[]>(["board"], (current = []) =>
+        current.map((item) => item.id === updated.id ? updated : item),
+      );
+      toast.success("Application status updated.");
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: ["board"] });
+      void queryClient.invalidateQueries({ queryKey: ["applications"] });
+      void queryClient.invalidateQueries({ queryKey: ["stats"] });
+    },
+  });
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor),
   );
 
-  useEffect(() => {
-    let cancelled = false;
-    getBoardApplications()
-      .then((data) => {
-        if (!cancelled) {
-          setApplications(data);
-          setFailed(false);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) setFailed(true);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [requestKey]);
-
-  async function handleDragEnd({ active, over }: DragEndEvent) {
+  function handleDragEnd({ active, over }: DragEndEvent) {
     const application = active.data.current?.application as
       | Application
       | undefined;
@@ -70,44 +91,15 @@ export default function KanbanBoard() {
     if (!application || !STATUSES.has(nextStatus)) return;
     if (application.status === nextStatus) return;
 
-    const previous = applications;
-    setMessage("");
-    setSaving(true);
-    setApplications((current) =>
-      current.map((item) =>
-        item.id === application.id
-          ? { ...item, status: nextStatus }
-          : item,
-      ),
-    );
-
-    try {
-      const updated = await updateApplication(application.id, {
-        status: nextStatus,
-      });
-      setApplications((current) =>
-        current.map((item) =>
-          item.id === updated.id ? updated : item,
-        ),
-      );
-      setMessage(`${application.position} moved to ${nextStatus.toLowerCase()}.`);
-    } catch {
-      setApplications(previous);
-      setMessage("Could not update the application status. The move was undone.");
-    } finally {
-      setSaving(false);
-    }
+    statusMutation.mutate({ id: application.id, status: nextStatus });
   }
 
-  if (loading) return <Loader label="Loading board..." />;
-  if (failed) {
+  if (boardQuery.isPending) return <Loader label="Loading board..." />;
+  if (boardQuery.isError) {
     return (
       <ErrorState
         message="Could not load the Kanban board."
-        onRetry={() => {
-          setLoading(true);
-          setRequestKey((current) => current + 1);
-        }}
+        onRetry={() => void boardQuery.refetch()}
       />
     );
   }
@@ -126,12 +118,6 @@ export default function KanbanBoard() {
         </p>
       </header>
 
-      {message && (
-        <p role="status" className="mt-4 text-sm text-[#53615a] dark:text-[#b4c0ba]">
-          {message}
-        </p>
-      )}
-
       <DndContext
         sensors={sensors}
         collisionDetection={closestCorners}
@@ -144,7 +130,7 @@ export default function KanbanBoard() {
                 key={status}
                 status={status}
                 label={label}
-                disabled={saving}
+                disabled={statusMutation.isPending}
                 applications={applications.filter(
                   (application) => application.status === status,
                 )}
