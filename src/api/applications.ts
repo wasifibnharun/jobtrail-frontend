@@ -20,6 +20,9 @@ export interface Application {
   expected_salary: number | null;
   job_link: string;
   notes: string;
+  has_cv: boolean;
+  cv_download_url: string | null;
+  needs_follow_up: boolean;
   created_at: string;
   updated_at: string;
 }

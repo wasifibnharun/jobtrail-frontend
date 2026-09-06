@@ -5,7 +5,8 @@ import {
   Plus,
   Search,
   Trash2,
-  CheckCircle2
+  CheckCircle2,
+  Eye
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -267,6 +268,15 @@ export default function ApplicationList() {
                     </span>
                     {formatDate(application.applied_on)}
                   </div>
+
+                  <Link
+                    to={`/applications/${application.id}`}
+                    title="View details"
+                    aria-label={`View ${application.position} details`}
+                    className="glass dark:glass-dark flex size-9 items-center justify-center rounded-lg text-[#36413c] transition-all hover:bg-white/80 dark:text-[#dce5e0] dark:hover:bg-white/8"
+                  >
+                    <Eye size={16} aria-hidden="true" />
+                  </Link>
 
                   <Link
                     to={`/applications/${application.id}/edit`}
