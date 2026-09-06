@@ -6,6 +6,24 @@ if (!baseURL) {
   throw new Error("VITE_API_URL is not configured.");
 }
 
+interface ApiEnvelope<T> {
+  success: boolean;
+  message: string;
+  data: T;
+}
+
+function isApiEnvelope(
+  value: unknown,
+): value is ApiEnvelope<unknown> {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "success" in value &&
+    "message" in value &&
+    "data" in value
+  );
+}
+
 const client = axios.create({
   baseURL,
   headers: {
@@ -24,8 +42,20 @@ client.interceptors.request.use((config) => {
 });
 
 client.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (isApiEnvelope(response.data)) {
+      response.data = response.data.data;
+    }
+
+    return response;
+  },
   (error) => {
+    const responseData = error.response?.data;
+
+    if (isApiEnvelope(responseData) && error.response) {
+      error.response.data = responseData.data;
+    }
+
     if (error.response?.status === 401) {
       localStorage.removeItem("access");
       localStorage.removeItem("refresh");
